@@ -1,0 +1,28 @@
+<odoo>
+    <record id="crm_document_form_view" model="ir.ui.view">
+        <field name="name">crm.document.tag.form.view</field>
+        <field name="model">crm.document</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="file" filename="file_name"/>
+                        <field name="file_name" invisible="1"/>
+                    </group>
+                    <footer>
+                        <button name="add_document" type="object" string="Add" class="oe_highlight"/>
+                        <button string="Cancel" class="btn-default" special="cancel"/>
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_crm_document" model="ir.actions.act_window">
+        <field name="name">Add Document</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">crm.document</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>
