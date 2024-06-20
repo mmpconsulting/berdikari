@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <template id="report_bukti_kas_masuk">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="o">
+                <t t-set="lang" t-value="o.partner_id.lang"/>
+                  <style>
+                    table, td, th {
+                      border:1px solid black;
+                      padding: 2px;
+                      padding-left: 5px;
+                    }
+
+                    table {
+                      border-collapse: collapse;
+                      width: 100%;
+                    }
+
+                    *, p, span {
+                      font-size: 10px;
+                    }
+
+                    .centered-element {
+                      top: 50%;
+                      left: 50%;
+                      transform: translate(-50%, -50%);
+                    }
+
+                  </style>
+                  <table style="width:100%">
+                    <tr style="background-color: #bdd7ee;">
+                      <td style="width:15%; border-right: none; background-color: white;">
+                        <center><img t-if="o.company_id.logo" t-att-src="image_data_uri(o.company_id.logo)" style="max-height:35pt; max-width:80%"/></center>
+                      </td>
+                      <td colspan="3" style="width:40%; border-left: none;">
+                        <b><center><h3><span t-field="o.journal_id.judul_report" class="centered-element"/></h3></center></b>
+                      </td>
+                      <td colspan="2" style="width:40%">
+                        <p>No. : <span t-field="o.name"/></p>
+                        <p>Proyek/Bisnis Unit : <span t-field="o.analytic_distribution_convert_to_char"/></p>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="border-right: none;">
+                        <p>Dibayarkan Kepada</p>
+                          <p>Keterangan</p>
+                      </td>
+                      <td colspan="3" style="border-left: none;">
+                        <p>: <span t-field="o.dibayarkan_kpd_id"/></p> 
+                        <p>: <span t-field="o.ref"/></p> 
+                      </td>
+                      <td style="border-right: none;">
+                        <p>Tanggal</p>
+                          <p>Lampiran</p>
+                      </td>
+                      <td style="border-left: none;">
+                        <p>: <span t-field="o.date"/></p> 
+                        <p>: <span t-field="o.lampiran"/> Lembar</p>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <p><center><b>No. Akun</b></center></p>
+                      </td>
+                      <td colspan="2">
+                        <p><center><b>Nama Akun</b></center></p>
+                      </td>
+                      <td colspan="2">
+                        <p><center><b>Keterangan</b></center></p>
+                      </td>
+                      <td>
+                        <p><center><b>Jumlah</b></center></p>
+                      </td>
+                    </tr>
+                    <t t-set="total" t-value="0"/>
+                    <tr t-foreach="o.line_ids" t-as="line">
+                      <t t-if="o.journal_id.opsi_print == 'debit'">
+                        <t t-if="line.debit != 0.00">
+                          <t t-set="total" t-value="total + line.debit"/> 
+                          <td>
+                            <p><span t-field="line.account_id.code"/></p>
+                          </td>
+                          <td colspan="2">
+                            <p><span t-field="line.account_id.name"/></p>
+                          </td>
+                          <td colspan="2">
+                            <p><span t-field="line.name"/></p>
+                          </td>
+                          <td style="text-align: right;">                          	                                
+	                          <span style="text-align: left; float: left;" t-field="line.currency_id.symbol"/>
+	                          <!-- <t t-esc="'%.2f' % (line.debit)"/> -->                                  
+	                          <span style="text-align: right;" t-field="line.debit" t-options='{"widget": "float", "precision": 2}'/>
+                          </td>
+                        </t>
+                      </t>
+
+                      <t t-elif="o.journal_id.opsi_print == 'credit'">
+                        <t t-if="line.credit != 0.00">
+                          <t t-set="total" t-value="total + line.credit"/> 
+                          <td>
+                            <p><span t-field="line.account_id.code"/></p>
+                          </td>
+                          <td colspan="2">
+                            <p><span t-field="line.account_id.name"/></p>
+                          </td>
+                          <td colspan="2">
+                            <p><span t-field="line.name"/></p>
+                          </td>
+                          <td style="text-align: right;">                              
+	                          <span style="text-align: left; float: left;" t-field="line.currency_id.symbol"/>                                                            
+	                          <!-- <t t-esc="'%.2f' % (line.credit)"/> -->
+	                          <span style="text-align: right;" t-field="line.credit" t-options='{"widget": "float", "precision": 2}'/>                             
+                          </td>
+                        </t>
+                      </t>
+                    </tr>
+                    
+                    <tr>
+                      <td>
+                        
+                      </td>
+                      <td colspan="3" style="border-right:none">
+                        <p>Cek/BG No. <span t-field="o.cek_bg_no"/></p> 
+                      </td>
+                      <td style="float: right; border-left:none">
+                        <p>Jumlah</p>
+                      </td>
+                      <td style="text-align: right;">
+                        <!-- <p><b><span t-field="o.currency_id.symbol"/> <t t-esc="'%.2f' % (total)"/></b></p>  -->
+                        <p>
+                        	<span style="text-align: left; float: left;" t-field="line.currency_id.symbol"/>
+                        	<span t-esc="total" t-options='{"widget": "float", "precision": 2}'/>
+                        </p>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="border-right: none;">
+                        <p><center>Terbilang</center></p>
+                      </td>
+                      <td colspan="5" style="border-left: none;">
+                        <p>: <span t-field="o.terbilang"/></p>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <p><center>Dibuat Oleh</center></p>
+                      </td>
+                      <td>
+                        <p><center>Mengetahui</center></p>
+                      </td>
+                      <td colspan="2">
+                        <p><center>Menyetujui</center></p>
+                      </td>
+                      <td>
+                        <p><center>Dibukukan</center></p>
+                      </td>
+                      <td>
+                        <p><center>Diterima</center></p>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="width:16.67%;">
+                        <br/>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <br/>
+                      </td>
+                      <td style="width:16.67%;">
+                        <br/>
+                        <br/>
+                        <br/>
+                        <t t-if="o.lpj_kasbon_operasional_id">
+                          <p>
+                            <center><span t-field="o.lpj_kasbon_operasional_id.kasbon_id.diketahui_id.name"/></center>
+                          </p>
+                        </t>
+                        <t t-elif="o.kasbon_operasional_id">
+                          <p>
+                            <center><span t-field="o.kasbon_operasional_id.diketahui_id.name"/></center>
+                          </p>
+                        </t>
+                        <t t-else="">
+                          <br/>
+                        </t>
+                        <p><center>Manager Fin Acc</center></p>
+                      </td>
+                      <td style="width:16.67%; border-right: none;">
+                          <br/>
+                          <br/>
+                          <br/>
+                          <br/>                          
+                          <p><center>Wakil Direktur</center></p>
+                      </td>
+                      <td style="width:16.67%; border-left: none;">
+                        <br/>
+                        <br/>
+                        <br/>
+                        <t t-if="o.lpj_kasbon_operasional_id">
+                          <p>
+                            <center><span t-field="o.lpj_kasbon_operasional_id.disetujui_id.name"/></center>
+                          </p>
+                        </t>
+                        <t t-elif="o.kasbon_operasional_id">
+                          <p>
+                            <center><span t-field="o.kasbon_operasional_id.disetujui_id.name"/></center>
+                          </p>
+                        </t>
+                        <t t-else="">
+                          <br/>
+                        </t>
+                        <p><center>Direktur Utama</center></p>
+                      </td>
+                      <td style="width:16.67%;">
+                        <br/>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <t t-if="o.lpj_kasbon_operasional_id">
+                          <p>
+                              <center><span t-field="o.lpj_kasbon_operasional_id.dibukukan_id.name"/></center>
+                          </p>
+                        </t>
+                        <t t-else="">
+                          <br/>
+                        </t>
+                      </td>
+                      <td style="width:16.67%;">
+                        <br/>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <br/>
+                      </td>
+                    </tr>
+                  </table>
+                </t>
+            </t>
+        </template>
+    </data>
+
+</odoo>
+

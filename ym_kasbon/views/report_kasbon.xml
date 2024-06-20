@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <template id="report_kasbon">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="o">
+                <!-- <t t-set="lang" t-value="o.partner_id.lang"/> -->
+                   <style>
+                    table, td, th {
+                      border:1px solid black;
+                      padding: 2px;
+                      padding-left: 5px;
+                    }
+
+                    table {
+                      border-collapse: collapse;
+                      width: 100%;
+                    }
+
+                    *, p, span {
+                      font-size: 10px;
+                    }
+
+                    <!-- .centered-element { -->
+                      <!-- top: 50%; -->
+                      <!-- left: 50%; -->
+                      <!-- transform: translate(-50%, -50%); -->
+                    <!-- } -->
+
+                  </style>
+                  <table style="width:100%">
+                    <tr style="background-color: #ffff00;">
+                      <td colspan="2" style="border-right: none; background-color: white;">
+                        <center><img t-if="o.company_id.logo" t-att-src="image_data_uri(o.company_id.logo)" style="max-height:40pt; max-width:90%"/></center>
+                      </td>
+                      <td colspan="6" style="border-left: none; background-color: white;">
+                        <!-- <center><img t-if="o.company_id.logo" t-att-src="image_data_uri(o.company_id.logo)" style="max-height:40pt; max-width:90%"/></center> -->
+                      </td>
+                    </tr>
+                    <tr>
+                        <td colspan="8"><center><p><strong>FORMULIR KASBON OPERASIONAL</strong></p></center></td>
+                    </tr>
+                    <tr>
+                      <td colspan="2" style="border-right: none; padding-bottom: 2%; padding-top: 2%; padding-left: 5%;">
+                        <p>Tanggal</p>
+                        <p>Nomor</p>
+                        <p>Bisnis Unit</p>
+                        <p>Departemen</p>
+                        <p>Proyek</p>
+                      </td>
+                      <td colspan="6" style="border-left: none;">
+                        <p>: <span t-field="o.date"/> </p> 
+                        <p>: <span t-field="o.name"/> </p> 
+                        <p>: <span t-field="o.bisnis_unit_id.name"/> </p> 
+                        <p>: <span t-field="o.department_id.name"/> </p>
+                        <p>: <span t-field="o.analytic_distribution_convert_to_char"/> </p>
+                        <!-- <p>: <span t-field="o.analytic_distribution[0].name"/> </p> -->
+                      </td>
+                    </tr>
+
+                    <tr>
+                        <td colspan="6">
+                          <p><center>Uraian</center></p>
+                        </td>						
+                        <td colspan="2">
+                          <p><center>Jumlah</center></p> 
+                        </td> 
+                    </tr>
+
+                    <t t-set="total" t-value="0"/>
+                    <tr t-foreach="o.kasbon_operasional_ids" t-as="line">
+                        <t t-set="total" t-value="total + line.jumlah"/> 
+                        <td colspan="6" style="padding-left: 5%;">
+                          <p><span t-field="line.name"/></p>
+                        </td>
+                        <td colspan="2">
+                          <table style="border: none;">
+                            <tr style="border: none;">
+                              <td style="border: none;">
+                                Rp
+                              </td>
+                              <td style="border: none; text-align: right;">
+                                <span t-field="line.jumlah" t-options='{"widget": "float", "precision": 2}'/>
+                              </td>
+                            </tr>
+                          </table>
+                          <!-- <p><span>Rp </span><span t-field="line.jumlah" t-options='{"widget": "float", "precision": 2}'/></p> -->
+                        </td>
+                    </tr>
+
+                   
+                    <tr >
+                        <td colspan="6" style="padding-left: 5%;">
+                          <p>Total</p>
+                        </td>						
+                        <td colspan="2">
+                          <table style="border: none;">
+                            <tr style="border: none;">
+                              <td style="border: none;">
+                                Rp
+                              </td>
+                              <td style="border: none; text-align: right;">
+                                <t t-esc="total" t-options='{"widget": "float", "precision": 2}'/>
+                              </td>
+                            </tr>
+                          </table>
+                          <!-- <p>Rp <t t-esc="total" t-options='{"widget": "float", "precision": 2}'/></p> -->
+                        </td>
+                    </tr>
+
+                    <tr>
+                      <td colspan="2" style="padding-left: 5%; border-right: none; border-right: none; padding-bottom: 1%; padding-top: 1%;">
+                        <p>Terbilang</p>
+                      </td>
+                      <td colspan="6" style="border-left: none;">
+                        <p>: <span t-field="o.terbilang"/></p>
+                      </td>
+                    </tr>
+
+                   <tr>
+                      <td colspan="2">
+                        <p><center>Diketahui Oleh,</center></p>
+                      </td>
+                      <td colspan="2">
+                        <p><center>Disetujui Oleh,</center></p>
+                      </td >
+                      <td colspan="2">
+                        <p><center>Diserahkan Oleh,</center></p>
+                      </td>
+                      <td colspan="2">
+                        <p><center>Diterima Oleh,</center></p>
+                      </td>  
+                    </tr>
+
+                    <tr>
+                      <td colspan="2">
+                        <br/>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <t t-if="o.diketahui_id.name">
+                          <p>
+                            <center><span t-field="o.diketahui_id.name"/></center>
+                          </p>
+                        </t>
+                        <t t-else="">
+                          <br/>
+                        </t>
+                      </td>
+                      
+                      <td colspan="2">
+                        <br/>
+                        <br/>
+                        <br/>
+                        <t t-if="o.disetujui_id">
+                          <p>
+                            <center><span t-field="o.disetujui_id.name"/></center>
+                          </p>
+                        </t>
+                        <t t-else="">
+                          <br/>
+                        </t>
+                      </td>
+
+
+                      <td colspan="2">
+                        <br/>
+                        <br/>
+                        <br/>
+                        <t t-if="o.diserahkan_id">
+                          <p>
+                            <center><span t-field="o.diserahkan_id.name"/></center>
+                          </p>
+                        </t>
+                        <t t-else="">
+                          <br/>
+                        </t>
+                      </td>
+
+
+					            <td colspan="2">
+                        <br/>
+                        <br/>
+                        <br/>
+                        <t t-if="o.diterima_id">
+                          <p>
+                            <center><span t-field="o.diterima_id.name"/></center>
+                          </p>
+                        </t>
+                        <t t-else="">
+                          <br/>
+                        </t>
+                      </td>
+                    </tr>
+                  </table>
+                </t>
+            </t>
+        </template>
+    </data>
+
+</odoo>
+

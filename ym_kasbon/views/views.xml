@@ -1,0 +1,361 @@
+<odoo>
+  <data>
+
+    <record id="kasbon_account_account_view_form_inherit" model="ir.ui.view">
+        <field name="name">kasbon.account.view.account.form.inherit</field>
+        <field name="model">account.account</field>
+        <field name="inherit_id" ref="account.view_account_form"/>
+        <field name="arch" type="xml">
+          <xpath expr="//field[@name='account_type']" position="after">
+            <field name="sequence_code" />
+            <!-- <field name="property_account_receivable_id" /> -->
+          </xpath>
+        </field>
+      </record>
+
+     <record id="kasbon_account_analytic_account_view_form_inherit" model="ir.ui.view">
+        <field name="name">kasbon.account.analytic.account.form.inherit</field>
+        <field name="model">account.analytic.account</field>
+        <field name="inherit_id" ref="analytic.view_account_analytic_account_form"/>
+        <field name="arch" type="xml">
+          <xpath expr="//field[@name='plan_id']" position="after">
+            <field name="property_account_payable_id" />
+            <field name="property_account_receivable_id" />
+          </xpath>
+        </field>
+      </record>
+
+    <record id="view_move_form_inherit_ym_kasbon" model="ir.ui.view">
+      <field name="name">account.move.view.form.inherit</field>
+      <field name="model">account.move</field>
+      <field name="inherit_id" ref="account.view_move_form"/>
+      <field name="arch" type="xml">
+        <xpath expr="//field[@name='ref']" position="after">
+          <!-- <field name="dibayarkan_kpd_id" attrs="{'invisible': [('is_kasbon', '=', False)]}"/>
+          <field name="lampiran" attrs="{'invisible': [('is_kasbon', '=', False)]}"/>
+          <field name="cek_bg_no" attrs="{'invisible': [('is_kasbon', '=', False)]}"/> -->
+          <field name="dibayarkan_kpd_id"/>
+          <field name="lampiran"/>
+          <field name="cek_bg_no"/>
+          <field name="lpj_kasbon_operasional_id" invisible="1"/>
+          <field name="kasbon_operasional_id" invisible="1"/>
+          <field name="is_kasbon" invisible="1"/>
+          <field name="terbilang" invisible="1"/>
+        </xpath>
+        <xpath expr="//group[@id='header_right_group']" position="inside">
+          <field name="analytic_precision" invisible="1"/>
+          <field name="analytic_distribution" widget="analytic_distribution"/>
+          <field name="analytic_distribution_convert_to_char" invisible="1"/>
+        </xpath>
+      </field>
+    </record>
+
+    <record id="view_account_journal_form_inherit_ym_kasbon" model="ir.ui.view">
+      <field name="name">account.journal.view.form.inherit</field>
+      <field name="model">account.journal</field>
+      <field name="inherit_id" ref="account.view_account_journal_form"/>
+      <field name="arch" type="xml">
+        <xpath expr="//field[@name='type']" position="after">
+          <field name="is_kasbon"/>
+          <field name="is_lpj_kasbon"/>
+        </xpath>
+        <xpath expr="//page[@name='advanced_settings']" position="after">
+          <page name="kasbon_settings" string="Kasbon Settings" attrs="{'invisible': ['|', ('type', 'not in', ['bank', 'cash']), ('is_lpj_kasbon', '=', False), ('is_kasbon', '=', False)]}">
+            <group name="kasbon_detail">
+              <group name="kasbon_information" string="Kasbon Information">
+                <field name="account_debit_kasbon_id" attrs="{'required': [('is_kasbon', '=', True)]}"/>
+                <field name="account_credit_kasbon_id" attrs="{'required': [('is_kasbon', '=', True)]}"/>
+                <field name="account_credit_lpj_kasbon_id" attrs="{'required': [('is_lpj_kasbon', '=', True)]}"/>
+              </group>
+            </group>
+          </page>
+        </xpath>
+        <xpath expr="//field[@name='country_code']" position="after">
+          <field name="judul_report" />
+          <field name="opsi_print" />
+        </xpath>
+      </field>
+    </record>
+
+    <record id="kasbon_operasional_view_tree" model="ir.ui.view">
+      <field name="name">kasbon.operasional.view.tree</field>
+      <field name="model">kasbon.operasional</field>
+      <field name="arch" type="xml">
+        <tree string="Kasbon Operasional">
+          <field name="date" />
+          <field name="name" />
+          <field name="company_id" />
+          <field name="department_id" />
+          <field name="analytic_id" invisible="1"/>
+          <field name="analytic_distribution" widget="analytic_distribution"/>
+          <field name="state" />
+        </tree>
+      </field>
+    </record>
+
+    <record id="kasbon_operasional_view_form" model="ir.ui.view">
+      <field name="name">kasbon.operasional.view.form</field>
+      <field name="model">kasbon.operasional</field>
+      <field name="arch" type="xml">
+        <form string="Kasbon Operasional">
+          <header>
+              <button name="set_to_submission" states="draft" string="Submit" class="btn-primary" type="object" />
+              <button name="set_to_approved_1" states="submission" string="Approver 1" class="btn-primary" type="object" groups="ym_kasbon.group_approve_1_kasbon"/>
+              <button name="set_to_approved_2" states="approved_1" string="Approver 2" class="btn-primary" type="object" groups="ym_kasbon.group_approve_2_kasbon"/>
+              <button name="set_to_not_approved" states="submission" string="Not Approve"  type="object" groups="ym_kasbon.group_approve_1_kasbon"/>
+              <button name="set_to_not_approved" states="approved_1" string="Not Approve"  type="object" groups="ym_kasbon.group_approve_2_kasbon"/>
+              <button name="set_to_done" states="approved_2" string="Set to Done" class="btn-primary" type="object" groups="ym_kasbon.group_kasir"/>
+              <field name="state" widget="statusbar" statusbar_visible="draft,submission,approved_1,approved_2,done"/>
+          </header>
+          <sheet>
+            <group name="header">
+              <group name="kasbon_left">
+                <field name="name" readonly="1"/>
+                <field name="bisnis_unit_id" required="1" attrs="{'readonly': [('state' , '!=', 'draft')]}"/>
+                <field name="department_id" attrs="{'readonly': [('state' , '!=', 'draft')]}"/>
+                <field name="analytic_id" attrs="{'readonly': [('state' , '!=', 'draft')]}" invisible="1"/>
+                <field name="analytic_distribution" attrs="{'readonly': [('state' , '!=', 'draft')]}" widget="analytic_distribution"/>
+                <field name="analytic_distribution_convert_to_char" invisible="1"/>
+              </group>
+              <group name="kasbon_right">
+                <field name="date" required="1" attrs="{'readonly': [('state' , '!=', 'draft')]}"/>
+                <field name="journal_id" attrs="{'readonly': [('state' , '!=', 'approved_2')], 'invisible':[('state', 'not in', ['approved_2', 'done'])], 'required': [('state', 'in', ['approved_2', 'done'])]}"/>
+                <field name="account_credit_kasbon_id" attrs="{'readonly': [('state' , '!=', 'approved_2')], 'invisible':[('state', 'not in', ['approved_2', 'done'])], 'required': [('state', 'in', ['approved_2', 'done'])]}"/>
+              </group>
+            </group>
+            <notebook>
+              <page name="details" string="Details">
+                <field name="kasbon_operasional_ids" attrs="{'readonly': [('state' , '!=', 'draft')]}">
+                  <tree editable="bottom">
+                    <field name="name" required="1"/>
+                    <field name="jumlah" sum="Total"/>
+                  </tree>
+                </field>
+
+                <group col="12" class="oe_invoice_lines_tab" name="footer">
+                  <group colspan="8">
+                      <field name="terbilang" attrs="{'readonly': [('state' , '!=', 'draft')]}"/>
+                      <field name="note" placeholder="Terms and Conditions" colspan="2" nolabel="1"/>
+                  </group>
+                  <group colspan="4">
+                      <group class="oe_subtotal_footer oe_right">
+                          <field name="total"/>
+                      </group>
+                  </group>
+                </group>
+              </page>
+
+              <page name="other" string="Other">
+                <group name="info">
+                  <group name="info_detail_left">
+                    <field name="diketahui_id" attrs="{'readonly': [('state' , '!=', 'draft')]}"/>
+                    <field name="disetujui_id" attrs="{'readonly': [('state' , '!=', 'draft')]}"/>
+                    <field name="diserahkan_id" attrs="{'readonly': [('state' , '!=', 'draft')]}"/>
+                    <field name="diterima_id" attrs="{'readonly': [('state' , '!=', 'draft')]}"/>
+                  </group>
+                  <group name="info_detail_right">
+                    <field name="company_id" invisible="1" required="1"/>
+                    <field name="currency_id" invisible="1"/>
+                    <field name="analytic_precision" invisible="1"/>
+                    <field name="move_id" attrs="{'invisible': [('move_id' , '=', False)]}" readonly="1"/>
+                  </group>
+                </group>
+              </page>
+            </notebook>
+          </sheet>
+        </form>
+      </field>
+    </record>
+
+    <record id="lpj_kasbon_operasional_view_tree" model="ir.ui.view">
+      <field name="name">lpj.kasbon.operasional.view.tree</field>
+      <field name="model">lpj.kasbon.operasional</field>
+      <field name="arch" type="xml">
+        <tree string="LPJ Kasbon Operasional">
+          <field name="name" />
+          <field name="date" />
+          <field name="kasbon_id" />
+          <field name="department_id" />
+          <field name="analytic_id" invisible="1" />
+          <field name="analytic_distribution" widget="analytic_distribution"/>
+        </tree>
+      </field>
+    </record>
+
+    <record id="lpj_kasbon_operasional_view_form" model="ir.ui.view">
+      <field name="name">lpj.kasbon.operasional.view.form</field>
+      <field name="model">lpj.kasbon.operasional</field>
+      <field name="arch" type="xml">
+        <form string="LPJ Kasbon Operasional">
+          <header>
+              <button name="set_to_submission" states="draft" string="Submit" class="btn-primary" type="object" />
+              <button name="set_to_approved_1" states="submission" string="Approver 1" class="btn-primary" type="object" groups="ym_kasbon.group_approve_1_kasbon"/>
+              <button name="set_to_approved_2" states="approved_1" string="Approver 2" class="btn-primary" type="object" groups="ym_kasbon.group_approve_2_kasbon"/>
+              <button name="set_to_not_approved" states="submission" string="Not Approve"  type="object" groups="ym_kasbon.group_approve_1_kasbon"/>
+              <button name="set_to_not_approved" states="approved_1" string="Not Approve"  type="object" groups="ym_kasbon.group_approve_2_kasbon"/>
+              <button name="set_to_done" states="approved_2" string="Set to Done" class="btn-primary" type="object" groups="ym_kasbon.group_kasir"/>
+              <field name="state" widget="statusbar" statusbar_visible="draft,submission,approved_1,approved_2,done"/>
+          </header>
+          <sheet>
+            <span class="o_form_label">Name</span>
+            <div class="oe_title">
+                <h1>
+                    <field name="name" readonly="1"/>
+                </h1>
+            </div>
+            <group name="header">
+              <group name="kasbon_left">
+                <field name="kasbon_id" attrs="{'readonly': [('state' , '!=', 'draft')]}"/>
+                <field name="bisnis_unit_id" required="1" attrs="{'readonly': [('state' , '!=', 'draft')]}"/>
+                <field name="department_id" attrs="{'readonly': [('state' , '!=', 'draft')]}"/>
+                <field name="analytic_id" attrs="{'readonly': [('state' , '!=', 'draft')]}" invisible="1"/>
+                <field name="analytic_distribution" attrs="{'readonly': [('state' , '!=', 'draft')]}" widget="analytic_distribution"/>
+                <field name="analytic_distribution_convert_to_char" invisible="1"/>
+              </group>
+              <group name="kasbon_right">
+                <field name="date" required="1" attrs="{'readonly': [('state' , '!=', 'draft')]}"/>
+                <field name="journal_id" attrs="{'readonly': [('state' , '!=', 'approved_2')], 'invisible':[('state', 'not in', ['approved_2', 'done'])], 'required': [('state', 'in', ['approved_2', 'done'])]}"/>
+              </group>
+            </group>
+            <notebook>
+              <page name="details" string="Details">
+                <field name="lpj_line_ids" attrs="{'readonly': [('state' , '!=', 'draft')]}">
+                  <tree editable="bottom">
+                    <field name="no_sequence" required="1"/>
+                    <field name="date" required="1"/>
+                    <field name="ket" />
+                    <field name="account_id" required="1"/>
+                    <field name="currency_id" invisible="1"/>
+                    <field name="diserahkan_id" invisible="1"/>
+                    <field name="jumlah" sum="Total"/>
+                  </tree>
+                </field>
+
+                <group col="12" class="oe_invoice_lines_tab">
+                    <group colspan="8">
+                        <field name="note" placeholder="Terms and Conditions" colspan="2" nolabel="1"/>
+                    </group>
+
+                    <group colspan="4">
+                        <group class="oe_subtotal_footer oe_right">
+
+                            <field name="jumlah_kasbon" nolabel="1" colspan="2"/>
+
+                            <field name="total_pertanggungjawaban" colspan="2" nolabel="1"/>
+                            <field name="lebih_kurang_bayar" class="oe_subtotal_footer_separator"/>
+                        </group>
+                    </group>
+                </group>
+              </page>
+
+              <page name="other" string="Other">
+                <group name="info">
+                  <group name="info_detail_left">
+                    <field name="diserahkan_id" attrs="{'readonly': [('state' , '!=', 'draft')]}"/>
+                    <field name="diperiksa_id" attrs="{'readonly': [('state' , '!=', 'draft')]}"/>
+                    <field name="disetujui_id" attrs="{'readonly': [('state' , '!=', 'draft')]}"/>
+                    <field name="dibukukan_id" attrs="{'readonly': [('state' , '!=', 'draft')]}"/>
+                  </group>
+                  <group name="info_detail_right">
+                    <field name="company_id" invisible="1" required="1"/>
+                    <field name="currency_id" invisible="1"/>
+                    <field name="analytic_precision" invisible="1"/>
+                    <field name="move_id" attrs="{'invisible': [('move_id' , '=', False)]}" readonly="1"/>
+                  </group>
+                </group>
+              </page>
+
+              <page name="kurang_lebih" string="Kurang / Lebih">
+                <!-- <group name="info"> -->
+                  <field name="move_ids" attrs="{'readonly': [('state' , '!=', 'draft')]}">
+                    <tree editable="bottom">
+                      <field name="made_sequence_hole" invisible="1"/>
+                      <field name="name" decoration-bf="1" decoration-danger="made_sequence_hole"/>
+                      <field name="invoice_partner_display_name" invisible="context.get('default_move_type') not in ('in_invoice', 'in_refund','in_receipt')" groups="base.group_user" string="Vendor" />
+                      <field name="invoice_partner_display_name" invisible="context.get('default_move_type') not in ('out_invoice', 'out_refund','out_receipt')" groups="base.group_user" string="Customer" />
+                      <field name="invoice_date" optional="show" invisible="context.get('default_move_type') not in ('in_invoice', 'in_refund','in_receipt')" string="Bill Date"/>
+                      <field name="invoice_date" optional="show" invisible="context.get('default_move_type') not in ('out_invoice', 'out_refund','out_receipt')" string="Invoice Date"/>
+                      <field name="date" optional="hide" string="Accounting Date"/>
+                      <field name="invoice_date_due" widget="remaining_days" optional="show" attrs="{'invisible': [['payment_state', 'in', ('paid', 'in_payment', 'reversed')]]}"/>
+                      <field name="invoice_origin" optional="hide" string="Source Document"/>
+                      <field name="payment_reference" optional="hide" invisible="context.get('default_move_type') in ('out_invoice', 'out_refund','out_receipt')"/>
+                      <field name="ref" optional="hide"/>
+                      <field name="invoice_user_id" optional="hide" invisible="context.get('default_move_type') not in ('out_invoice', 'out_refund','out_receipt')" string="Salesperson" widget="many2one_avatar_user"/>
+                      <field name="activity_ids" widget="list_activity" optional="show"/>
+                      <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}" optional="hide"/>
+                      <field name="company_id" groups="!base.group_multi_company" invisible="1"/>
+                      <field name="amount_untaxed_signed" string="Tax Excluded" sum="Total" optional="show"/>
+                      <field name="amount_tax_signed" string="Tax" sum="Total" optional="hide"/>
+                      <field name="amount_total_signed" string="Total" sum="Total" decoration-bf="1" optional="show"/>
+                      <field name="amount_total_in_currency_signed" string="Total in Currency" groups="base.group_multi_currency"  optional="show"/>
+                      <field name="amount_residual_signed" string="Amount Due" sum="Amount Due" optional="hide"/>
+                      <field name="currency_id" groups="base.group_multi_currency" optional="hide"/>
+                      <field name="company_currency_id" invisible="1"/>
+                      <field name="to_check" optional="hide" widget="boolean_toggle"/>
+                      <field name="payment_state"
+                            widget="badge"
+                            decoration-danger="payment_state == 'not_paid'"
+                            decoration-warning="payment_state in ('partial', 'in_payment')"
+                            decoration-success="payment_state in ('paid', 'reversed')"
+                            attrs="{'invisible': [('payment_state', 'in', ('invoicing_legacy'))]}"
+                            optional="show"/>
+                      <field name="state" widget="badge" decoration-success="state == 'posted'" decoration-info="state == 'draft'" optional="show"/>
+                      <field name="move_type" invisible="context.get('default_move_type', True)"/>
+                    </tree>
+                  </field>
+                <!-- </group> -->
+              </page>
+            </notebook>
+          </sheet>
+        </form>
+      </field>
+    </record>
+
+    <record id="sequence_kasbon_seq" model="ir.sequence">
+        <field name="name">Kasbon Operasional</field>
+        <field name="code">kasbon.operasional</field>
+        <field name="suffix">/KSB/JV/%(year)s</field>
+        <field name="padding">3</field>
+    </record>
+
+    <record id="sequence_lpj_kasbon_seq" model="ir.sequence">
+        <field name="name">LPJ Kasbon Operasional</field>
+        <field name="code">lpj.kasbon.operasional</field>
+        <field name="suffix">/LPJ-KSB/JV/%(year)s</field>
+        <field name="padding">3</field>
+    </record>
+
+    <record id="kasbon_operasional_action" model="ir.actions.act_window">
+      <field name="name">Kasbon Operasional</field>
+      <field name="res_model">kasbon.operasional</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="lpj_kasbon_operasional_action" model="ir.actions.act_window">
+      <field name="name">LPJ Kasbon Operasional</field>
+      <field name="res_model">lpj.kasbon.operasional</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem
+      id="kasbon_menu"
+      name="Kasbon"
+      parent="account_accountant.menu_accounting"
+      sequence="3"/>
+    
+    <menuitem
+      id="kasbon_operasional_menu"
+      name="Kasbon Operasional"
+      action="kasbon_operasional_action"
+      parent="kasbon_menu"
+      sequence="1"/>
+
+    <menuitem
+      id="lpj_kasbon_operasional_menu"
+      name="LPJ Kasbon Operasional"
+      action="lpj_kasbon_operasional_action"
+      parent="kasbon_menu"
+      sequence="2"/>
+
+  </data>
+</odoo>

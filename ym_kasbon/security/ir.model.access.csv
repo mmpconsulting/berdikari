@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_kasbon_operasional,kasbon_operasional,model_kasbon_operasional,,1,1,1,1
+access_kasbon_operasional_line,kasbon_operasional_line,model_kasbon_operasional_line,,1,1,1,1
+access_lpj_kasbon_operasional,lpj_kasbon_operasional,model_lpj_kasbon_operasional,,1,1,1,1
+access_lpj_kasbon_operasional_line,lpj_kasbon_operasional_line,model_lpj_kasbon_operasional_line,,1,1,1,1
